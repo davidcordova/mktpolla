@@ -28,6 +28,7 @@ export const Dashboard: React.FC = () => {
   const [groupPredCount, setGroupPredCount] = useState(0);
   const [bracketPredCount, setBracketPredCount] = useState(0);
   const [championTeam, setChampionTeam] = useState<any>(null);
+  const [isChangingChampion, setIsChangingChampion] = useState(false);
   
   const [loading, setLoading] = useState(true);
 
@@ -313,7 +314,7 @@ export const Dashboard: React.FC = () => {
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h3 style={{ fontSize: '1.25rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>Mi Campeón Predicho</h3>
           
-          {championTeam ? (
+          {championTeam && !isChangingChampion ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', flex: '1', justifyContent: 'center' }}>
               <img 
                 src={getFlagUrl(championTeam.code)} 
@@ -358,22 +359,47 @@ export const Dashboard: React.FC = () => {
                   </div>
                 )}
               </div>
+              
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setIsChangingChampion(true)}
+                style={{ padding: '6px 12px', fontSize: '0.78rem', marginTop: '4px' }}
+              >
+                Cambiar Selección
+              </button>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: '1', justifyContent: 'center' }}>
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textAlign: 'center' }}>Aún no has elegido a tu campeón predicho. ¡Elige uno ahora!</span>
-              <div className="form-group" style={{ margin: '0' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                {championTeam ? 'Selecciona un nuevo campeón predicho:' : 'Aún no has elegido a tu campeón predicho. ¡Elige uno ahora!'}
+              </span>
+              <div className="form-group" style={{ margin: '0', display: 'flex', gap: '8px' }}>
                 <select 
                   id="select-champion-quick"
                   className="form-input" 
-                  onChange={(e) => handleChampionSelect(e.target.value)}
-                  defaultValue=""
+                  onChange={(e) => {
+                    handleChampionSelect(e.target.value);
+                    setIsChangingChampion(false);
+                  }}
+                  defaultValue={championTeam?.code || ""}
+                  style={{ flex: 1 }}
                 >
                   <option value="" disabled>Selecciona tu Campeón...</option>
                   {teams.map(t => (
                     <option key={t.code} value={t.code}>{t.name}</option>
                   ))}
                 </select>
+                {championTeam && (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setIsChangingChampion(false)}
+                    style={{ padding: '0 12px' }}
+                  >
+                    Cancelar
+                  </button>
+                )}
               </div>
             </div>
           )}
