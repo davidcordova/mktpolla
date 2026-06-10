@@ -105,16 +105,22 @@ public_html/
 
 React Router utiliza rutas dinámicas virtuales del lado del cliente (ej. `/group-predictions`, `/bracket-predictions`, `/rankings`). Si un usuario recarga la página o entra directamente a una subruta, Apache dará un error **404 Not Found**. 
 
-Para resolverlo, debes crear un archivo llamado **`.htaccess`** en la carpeta principal `public_html` con el siguiente contenido:
+Para resolverlo, debes crear un archivo llamado **`.htaccess`** en tu carpeta de la polla (ej. `public_html/mktpolla/.htaccess`) con el siguiente contenido:
 
 ```apache
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
+  RewriteBase /mktpolla/
+
+  # Habilitar el paso del encabezado de Autorización (Authorization Header) a PHP 
+  # (Esencial en cPanel con CGI/FastCGI/PHP-FPM, de lo contrario dará error 401 Unauthorized)
+  RewriteCond %{HTTP:Authorization} ^(.*)
+  RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  RewriteRule . /mktpolla/index.html [L]
 </IfModule>
 ```
 
