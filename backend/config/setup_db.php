@@ -257,7 +257,7 @@ try {
     
     // Seed Group Matches (72 matches)
     // Clear matches table to prevent duplication issues or regenerate cleanly
-    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE matches; SET FOREIGN_KEY_CHECKS = 1;");
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0; DELETE FROM matches; ALTER TABLE matches AUTO_INCREMENT = 1; SET FOREIGN_KEY_CHECKS = 1;");
     
     $stmtMatch = $pdo->prepare("INSERT INTO matches (stage, group_name, team_a_code, team_b_code, match_date) VALUES ('GROUPS', ?, ?, ?, ?)");
     

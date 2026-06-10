@@ -1,13 +1,20 @@
 -- Limpiar datos existentes de equipos y partidos
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE ranking_history;
-TRUNCATE TABLE league_members;
-TRUNCATE TABLE leagues;
-TRUNCATE TABLE bracket_predictions;
-TRUNCATE TABLE group_predictions;
-TRUNCATE TABLE matches;
-TRUNCATE TABLE teams;
-TRUNCATE TABLE users;
+DELETE FROM ranking_history;
+DELETE FROM league_members;
+DELETE FROM leagues;
+DELETE FROM bracket_predictions;
+DELETE FROM group_predictions;
+DELETE FROM matches;
+DELETE FROM teams;
+DELETE FROM users;
+
+ALTER TABLE ranking_history AUTO_INCREMENT = 1;
+ALTER TABLE leagues AUTO_INCREMENT = 1;
+ALTER TABLE bracket_predictions AUTO_INCREMENT = 1;
+ALTER TABLE group_predictions AUTO_INCREMENT = 1;
+ALTER TABLE matches AUTO_INCREMENT = 1;
+ALTER TABLE users AUTO_INCREMENT = 1;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Insertar Administrador por Defecto y Usuarios de Demo
