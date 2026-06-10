@@ -28,7 +28,7 @@ function recalculateUserPoints($userId) {
         'hits_total' => 0
     ];
 
-    // 1. PUNTOS POR FASE DE GRUPOS (+1 punto por acierto, +2 puntos adicionales por marcador exacto)
+    // 1. PUNTOS POR FASE DE GRUPOS (+1 punto por acierto, +1 punto adicional por marcador exacto)
     $stmt = $db->prepare("
         SELECT gp.prediction, gp.predicted_team_a_score, gp.predicted_team_b_score, m.team_a_score, m.team_b_score 
         FROM group_predictions gp
@@ -52,7 +52,7 @@ function recalculateUserPoints($userId) {
             if ($gp['predicted_team_a_score'] !== null && $gp['predicted_team_b_score'] !== null &&
                 intval($gp['predicted_team_a_score']) === intval($gp['team_a_score']) &&
                 intval($gp['predicted_team_b_score']) === intval($gp['team_b_score'])) {
-                $pts += 2; // +2 adicionales (total 3)
+                $pts += 1; // +1 adicional (total 2)
             }
             $breakdown['groups'] += $pts;
             $breakdown['hits_groups'] += 1;

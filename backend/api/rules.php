@@ -15,7 +15,7 @@ respondJson([
         'group_stage' => [
             'title' => 'Fase de Grupos',
             'points' => 1,
-            'description' => 'Acierta si gana el equipo A, empatan, o gana el equipo B.'
+            'description' => 'Acierta el resultado 1X2 (Gana A, Empate o Gana B). Colocar marcador es opcional, pero si lo aciertas exacto obtienes +1 punto adicional (Total 2 puntos).'
         ],
         'knockout' => [
             'round_of_32' => [
