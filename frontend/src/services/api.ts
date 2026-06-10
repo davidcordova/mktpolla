@@ -1,6 +1,8 @@
 // frontend/src/services/api.ts
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = window.location.origin.includes('localhost') 
+    ? 'http://localhost:8000/api' 
+    : `${window.location.origin}/api`;
 
 function getHeaders(): HeadersInit {
     const headers: HeadersInit = {
