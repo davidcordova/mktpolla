@@ -175,8 +175,24 @@ export const GroupPredictions: React.FC = () => {
       const isSaved = savedPredictionIds.has(m.id);
       if (!m.finished && !isSaved) {
         hasNew = true;
-        const scoreA = Math.floor(Math.random() * 5);
-        const scoreB = Math.floor(Math.random() * 5);
+        const current = predictions[m.id];
+        let scoreA = Math.floor(Math.random() * 5);
+        let scoreB = Math.floor(Math.random() * 5);
+        
+        // If there is already a temporary prediction, force a different score combination
+        if (current && current.predicted_team_a_score !== '' && current.predicted_team_b_score !== '') {
+          let attempts = 0;
+          while (
+            scoreA === current.predicted_team_a_score && 
+            scoreB === current.predicted_team_b_score && 
+            attempts < 15
+          ) {
+            scoreA = Math.floor(Math.random() * 5);
+            scoreB = Math.floor(Math.random() * 5);
+            attempts++;
+          }
+        }
+        
         autoPreds[m.id] = {
           prediction: scoreA > scoreB ? 'A' : scoreA < scoreB ? 'B' : 'DRAW',
           predicted_team_a_score: scoreA,
