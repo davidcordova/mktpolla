@@ -1,10 +1,28 @@
 <?php
 // backend/config/db.php
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'polla_mundialista_2026');
+// Detección dinámica de entorno (local vs producción)
+$isLocal = false;
+if (php_sapi_name() === 'cli') {
+    $isLocal = true;
+} elseif (isset($_SERVER['HTTP_HOST']) && (
+    str_starts_with($_SERVER['HTTP_HOST'], 'localhost') || 
+    str_starts_with($_SERVER['HTTP_HOST'], '127.0.0.1')
+)) {
+    $isLocal = true;
+}
+
+if ($isLocal) {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'polla_mundialista_2026');
+} else {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'alterno_mktpolla');
+    define('DB_PASS', 'M1un1c4cl4v3');
+    define('DB_NAME', 'alterno_mktpolla');
+}
 
 function getDBConnection() {
     static $pdo = null;
