@@ -1,8 +1,13 @@
 // frontend/src/services/api.ts
 
+const getBasePath = () => {
+    const pathname = window.location.pathname;
+    return pathname.substring(0, pathname.lastIndexOf('/') + 1);
+};
+
 const API_BASE_URL = window.location.origin.includes('localhost') 
     ? 'http://localhost:8000/api' 
-    : `${window.location.origin}/api`;
+    : `${window.location.origin}${getBasePath()}api`;
 
 function getHeaders(): HeadersInit {
     const headers: HeadersInit = {
