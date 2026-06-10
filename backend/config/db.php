@@ -6,8 +6,8 @@ $isLocal = false;
 if (php_sapi_name() === 'cli') {
     $isLocal = true;
 } elseif (isset($_SERVER['HTTP_HOST']) && (
-    str_starts_with($_SERVER['HTTP_HOST'], 'localhost') || 
-    str_starts_with($_SERVER['HTTP_HOST'], '127.0.0.1')
+    substr($_SERVER['HTTP_HOST'], 0, 9) === 'localhost' || 
+    substr($_SERVER['HTTP_HOST'], 0, 9) === '127.0.0.1'
 )) {
     $isLocal = true;
 }
