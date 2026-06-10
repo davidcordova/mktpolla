@@ -12,6 +12,9 @@ const API_BASE_URL = window.location.origin.includes('localhost')
 function getHeaders(): HeadersInit {
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
     };
     const token = localStorage.getItem('polla_token');
     if (token) {
@@ -115,29 +118,40 @@ export const api = {
 
 export const getFlagUrl = (code: string) => {
     if (!code) return '';
-    let flagCode = code.toLowerCase().substring(0, 2);
+    const upperCode = code.toUpperCase();
+    let flagCode = upperCode.substring(0, 2).toLowerCase();
+    
     // Custom mapping exceptions
-    if (code === 'USA') flagCode = 'us';
-    if (code === 'MEX') flagCode = 'mx';
-    if (code === 'JAM') flagCode = 'jm';
-    if (code === 'SEN') flagCode = 'sn';
-    if (code === 'KOR') flagCode = 'kr';
-    if (code === 'IRQ') flagCode = 'iq';
-    if (code === 'TUN') flagCode = 'tn';
-    if (code === 'UKR') flagCode = 'ua';
-    if (code === 'NED') flagCode = 'nl';
-    if (code === 'ENG') flagCode = 'gb-eng';
-    if (code === 'GER') flagCode = 'de';
-    if (code === 'POR') flagCode = 'pt';
-    if (code === 'DEN') flagCode = 'dk';
-    if (code === 'CRO') flagCode = 'hr';
-    if (code === 'SUI') flagCode = 'ch';
-    if (code === 'SWE') flagCode = 'se';
-    if (code === 'RSA') flagCode = 'za';
-    if (code === 'NGA') flagCode = 'ng';
-    if (code === 'KSA') flagCode = 'sa';
-    if (code === 'CHI') flagCode = 'cl';
-    if (code === 'URU') flagCode = 'uy';
-    if (code === 'PAR') flagCode = 'py';
+    if (upperCode === 'USA') flagCode = 'us';
+    if (upperCode === 'MEX') flagCode = 'mx';
+    if (upperCode === 'JAM') flagCode = 'jm';
+    if (upperCode === 'SEN') flagCode = 'sn';
+    if (upperCode === 'KOR') flagCode = 'kr';
+    if (upperCode === 'IRQ') flagCode = 'iq';
+    if (upperCode === 'TUN') flagCode = 'tn';
+    if (upperCode === 'UKR') flagCode = 'ua';
+    if (upperCode === 'NED') flagCode = 'nl';
+    if (upperCode === 'ENG') flagCode = 'gb-eng';
+    if (upperCode === 'GER') flagCode = 'de';
+    if (upperCode === 'POR') flagCode = 'pt';
+    if (upperCode === 'DEN') flagCode = 'dk';
+    if (upperCode === 'CRO') flagCode = 'hr';
+    if (upperCode === 'SUI') flagCode = 'ch';
+    if (upperCode === 'SWE') flagCode = 'se';
+    if (upperCode === 'RSA') flagCode = 'za';
+    if (upperCode === 'NGA') flagCode = 'ng';
+    if (upperCode === 'KSA') flagCode = 'sa';
+    if (upperCode === 'CHI') flagCode = 'cl';
+    if (upperCode === 'URU') flagCode = 'uy';
+    if (upperCode === 'PAR') flagCode = 'py';
+    if (upperCode === 'BIH') flagCode = 'ba';
+    if (upperCode === 'SCO') flagCode = 'gb-sct';
+    if (upperCode === 'HAI') flagCode = 'ht';
+    if (upperCode === 'TUR') flagCode = 'tr';
+    if (upperCode === 'CUW') flagCode = 'cw';
+    if (upperCode === 'CPV') flagCode = 'cv';
+    if (upperCode === 'AUT') flagCode = 'at';
+    if (upperCode === 'COD') flagCode = 'cd';
+    
     return `https://flagcdn.com/w80/${flagCode}.png`;
 };

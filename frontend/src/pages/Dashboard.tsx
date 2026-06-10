@@ -49,6 +49,7 @@ export const Dashboard: React.FC = () => {
 
   // Fetch dashboard stats & upcoming matches
   useEffect(() => {
+    if (!user) return;
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -73,62 +74,42 @@ export const Dashboard: React.FC = () => {
             setMatches([]);
           }
           
-          // Count predictions
+          const allTeams = matchesRes.teams || [];
+          setTeams(allTeams.sort((a: any, b: any) => a.name.localeCompare(b.name)));
+          
+          // Fetch champion predicted status
+          if (user?.champion_predicted_id) {
+            const predictedId = user.champion_predicted_id;
+            const teamDetail = allTeams.find((t: any) => t.code === predictedId);
+            if (teamDetail) {
+              const isAlive = teamDetail.eliminated === 0 || teamDetail.eliminated === false || teamDetail.eliminated === '0';
+              setChampionTeam({
+                code: predictedId,
+                name: teamDetail.name,
+                logo: teamDetail.logo_url,
+                alive: isAlive
+              });
+              setSelectedTempChampion(predictedId);
+            }
+          } else {
+            setChampionTeam(null);
+            setSelectedTempChampion('');
+          }
+        }
+        
+        // Count predictions
+        try {
           const groupPreds = await api.getPredictions('GROUPS');
           setGroupPredCount(groupPreds.predictions.length);
-          
+        } catch (e) {
+          console.error(e);
+        }
+        
+        try {
           const bracketPreds = await api.getPredictions('ELIMINATORY');
           setBracketPredCount(bracketPreds.predictions.length);
-        }
-        
-        // Load teams for champion selection
-        const matchesData = await api.getMatches();
-        // Extract teams
-        const uniqueTeams: any[] = [];
-        const map = new Map();
-        for (const m of matchesData.matches) {
-          if (!map.has(m.team_a_code)) {
-            map.set(m.team_a_code, true);
-            uniqueTeams.push({ code: m.team_a_code, name: m.team_a_name, logo: m.team_a_logo });
-          }
-          if (!map.has(m.team_b_code)) {
-            map.set(m.team_b_code, true);
-            uniqueTeams.push({ code: m.team_b_code, name: m.team_b_name, logo: m.team_b_logo });
-          }
-        }
-        setTeams(uniqueTeams.sort((a,b) => a.name.localeCompare(b.name)));
-        
-        // Fetch stats is removed as it is not used in view
-        
-        // Fetch champion predicted status
-        if (user?.champion_predicted_id) {
-          const predictedId = user.champion_predicted_id;
-          const teamDetail = uniqueTeams.find(t => t.code === predictedId);
-          if (teamDetail) {
-            let isAlive = true;
-            try {
-              const rankingsRes = await api.getRankings();
-              if (rankingsRes.status === 'success') {
-                const selfRank = rankingsRes.rankings.find((r: any) => Number(r.user_id) === Number(user.id));
-                if (selfRank && selfRank.champion) {
-                  isAlive = selfRank.champion.active;
-                }
-              }
-            } catch (rErr) {
-              console.error('Error fetching rankings for champion status:', rErr);
-            }
-            
-            setChampionTeam({
-              code: predictedId,
-              name: teamDetail.name,
-              logo: teamDetail.logo,
-              alive: isAlive
-            });
-            setSelectedTempChampion(predictedId);
-          }
-        } else {
-          setChampionTeam(null);
-          setSelectedTempChampion('');
+        } catch (e) {
+          console.error(e);
         }
         
       } catch (err) {
@@ -139,7 +120,7 @@ export const Dashboard: React.FC = () => {
     };
     
     fetchData();
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (user) {
@@ -186,11 +167,31 @@ export const Dashboard: React.FC = () => {
     try {
       const res = await api.saveChampion(code);
       if (res.status === 'success') {
-        // Refresh local user state
-        const profileRes = await api.getProfile();
-        if (profileRes.status === 'success') {
-          updateUser(profileRes.user);
+        const teamDetail = teams.find(t => t.code === code);
+        if (teamDetail) {
+          const isAlive = teamDetail.eliminated === 0 || teamDetail.eliminated === false || teamDetail.eliminated === '0';
+          setChampionTeam({
+            code: code,
+            name: teamDetail.name,
+            logo: teamDetail.logo_url || teamDetail.logo,
+            alive: isAlive
+          });
+          setSelectedTempChampion(code);
         }
+        
+        if (user) {
+          updateUser({
+            ...user,
+            champion_predicted_id: code
+          });
+        }
+        
+        // Background refresh to keep in sync
+        api.getProfile().then(profileRes => {
+          if (profileRes.status === 'success') {
+            updateUser(profileRes.user);
+          }
+        }).catch(err => console.error('Error background-updating profile:', err));
       }
     } catch (err: any) {
       alert(err.message || 'Error al guardar campeón.');
