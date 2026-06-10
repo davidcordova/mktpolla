@@ -121,7 +121,7 @@ const AppContent: React.FC = () => {
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
-      <main className="main-content">
+      <main className={`main-content ${currentTab === 'bracket' ? 'bracket-tab-active' : ''}`}>
         {renderActiveTab()}
       </main>
     </div>

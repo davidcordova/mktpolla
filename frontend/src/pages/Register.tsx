@@ -15,6 +15,7 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
   const [password, setPassword] = useState('');
   const [country, setCountry] = useState('Marketing Alterno');
   const [favoriteTeam, setFavoriteTeam] = useState('MEX');
+  const [gender, setGender] = useState('neutro');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,13 +24,22 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
     setError('');
     setLoading(true);
 
+    const baseAvatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || 'user')}`;
+    let avatarUrl = baseAvatarUrl;
+    if (gender === 'masculino') {
+      avatarUrl = `${baseAvatarUrl}&hair=short01,short02,short03,short04,short05,short06,short07,short08,short09,short10,short11,short12,short13,short14,short15,short16,short17,short18,short19`;
+    } else if (gender === 'femenino') {
+      avatarUrl = `${baseAvatarUrl}&hair=long01,long02,long03,long04,long05,long06,long07,long08,long09,long10,long11,long12,long13,long14,long15,long16,long17,long18,long19,long20,long21,long22,long23,long24,long25,long26&features=blush,birthmark,freckles`;
+    }
+
     try {
       await register({
         name,
         email,
         password,
         country,
-        favoriteTeam
+        favoriteTeam,
+        avatarUrl
       });
     } catch (err: any) {
       setError(err.message || 'Error al crear la cuenta.');
@@ -190,6 +200,23 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
                 minLength={6}
                 required
               />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="register-gender">Preferencia de Género (para el Avatar)</label>
+            <div style={{ position: 'relative' }}>
+              <select
+                id="register-gender"
+                className="form-input"
+                style={{ width: '100%', appearance: 'none' }}
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="neutro" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Neutro / Otro</option>
+                <option value="masculino" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Masculino</option>
+                <option value="femenino" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Femenino</option>
+              </select>
             </div>
           </div>
 

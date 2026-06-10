@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { api, getFlagUrl as getFlagUrlBase } from '../services/api';
-import { Save, Info, RefreshCw, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Send, Info, RefreshCw, CheckCircle2, ChevronLeft, ChevronRight, Minus, Plus, Maximize2 } from 'lucide-react';
 
 interface BracketMatch {
   teamA: string;
@@ -37,6 +37,9 @@ export const BracketPredictions: React.FC = () => {
   const [msg, setMsg] = useState('');
   const [isBracketLocked, setIsBracketLocked] = useState(true);
 
+  // Zoom and Fit states
+  const [zoom, setZoom] = useState(1);
+
   // Drag-to-scroll, keyboard navigation, and chevron state & handlers
   const bracketRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -51,6 +54,19 @@ export const BracketPredictions: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [showScrollControls, setShowScrollControls] = useState(false);
+
+  const handleFitScreen = () => {
+    if (bracketRef.current) {
+      const containerWidth = bracketRef.current.clientWidth;
+      const bracketContentWidth = 2050; // Total width of 9 rounds + gaps + safety
+      if (containerWidth < bracketContentWidth) {
+        const fitZoom = Math.max(0.5, Math.min(1.0, (containerWidth - 20) / bracketContentWidth));
+        setZoom(fitZoom);
+      } else {
+        setZoom(1.0);
+      }
+    }
+  };
 
   const updateScrollButtons = () => {
     if (bracketRef.current) {
@@ -155,6 +171,36 @@ export const BracketPredictions: React.FC = () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, []);
+
+  // Zoom change listener to update buttons
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateScrollButtons();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [zoom]);
+
+  // Window resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      updateScrollButtons();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // Fit screen automatically when loading ends
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        handleFitScreen();
+        updateScrollButtons();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
   
   // To allow easy team logo rendering, we'll keep a code-to-name/logo dictionary
@@ -423,11 +469,11 @@ export const BracketPredictions: React.FC = () => {
         setSavedChampion(champion);
       }
       
-      setMsg('¡Pronósticos del bracket guardados correctamente!');
-      setTimeout(() => setMsg(''), 4000);
+      setMsg('¡Tus pronósticos del bracket se enviaron con éxito! Las modificaciones han sido bloqueadas.');
+      setTimeout(() => setMsg(''), 5000);
       
     } catch (err: any) {
-      alert(err.message || 'Error al guardar pronósticos.');
+      alert(err.message || 'Error al enviar pronósticos.');
     } finally {
       setSaving(false);
     }
@@ -556,9 +602,59 @@ export const BracketPredictions: React.FC = () => {
           {saving ? (
             <RefreshCw className="animate-spin" style={{ width: '16px', height: '16px' }} />
           ) : (
-            <Save style={{ width: '16px', height: '16px' }} />
+            <Send style={{ width: '16px', height: '16px' }} />
           )}
-          Guardar Llaves
+          Enviar Llaves
+        </button>
+      </div>
+
+      {/* Zoom and Controls Toolbar */}
+      <div className="glass-panel" style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        alignSelf: 'flex-start',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-light)',
+        boxShadow: 'var(--box-shadow)'
+      }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-secondary)' }}>Zoom:</span>
+        <button 
+          onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}
+          className="btn-secondary"
+          style={{ padding: '6px 10px', borderRadius: '6px', minWidth: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          title="Zoom Out"
+        >
+          <Minus style={{ width: '14px', height: '14px' }} />
+        </button>
+        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--color-gold)', minWidth: '45px', textAlign: 'center' }}>
+          {Math.round(zoom * 100)}%
+        </span>
+        <button 
+          onClick={() => setZoom(prev => Math.min(1.2, prev + 0.1))}
+          className="btn-secondary"
+          style={{ padding: '6px 10px', borderRadius: '6px', minWidth: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          title="Zoom In"
+        >
+          <Plus style={{ width: '14px', height: '14px' }} />
+        </button>
+        <div style={{ width: '1px', height: '16px', background: 'var(--border-light)' }}></div>
+        <button 
+          onClick={() => setZoom(1.0)}
+          className="btn-secondary"
+          style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}
+        >
+          100%
+        </button>
+        <button 
+          onClick={handleFitScreen}
+          className="btn-accent"
+          style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}
+        >
+          <Maximize2 style={{ width: '12px', height: '12px' }} />
+          Ajustar Vista
         </button>
       </div>
 
@@ -714,9 +810,17 @@ export const BracketPredictions: React.FC = () => {
             outline: 'none'
           }}
         >
-          
-          {/* LEFT ROUND OF 32 */}
-          <div className="bracket-round">
+          <div style={{
+            display: 'flex',
+            gap: '32px',
+            zoom: zoom,
+            transformOrigin: 'top left',
+            transition: 'zoom 0.15s ease-out',
+            width: 'max-content',
+            minHeight: '940px'
+          }}>
+            {/* LEFT ROUND OF 32 */}
+            <div className="bracket-round">
             <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>16avos</h4>
             <div className="bracket-matches-col">
               {bracket.ROUND_OF_32.slice(0, 8).map((_, idx) => renderBracketMatch('ROUND_OF_32', idx, `r32-l-${idx}`))}
@@ -790,6 +894,7 @@ export const BracketPredictions: React.FC = () => {
             </div>
           </div>
 
+          </div>
         </div>
       </div>
       

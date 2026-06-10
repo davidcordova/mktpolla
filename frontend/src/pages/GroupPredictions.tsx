@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, getFlagUrl } from '../services/api';
-import { Sparkles, Save, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Sparkles, Send, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export const GroupPredictions: React.FC = () => {
   const [activeGroup, setActiveGroup] = useState('A');
@@ -146,21 +146,21 @@ export const GroupPredictions: React.FC = () => {
         });
       
       if (predictionsPayload.length === 0) {
-        setMsg('No hay nuevos pronósticos por guardar.');
+        setMsg('No hay nuevos pronósticos por enviar.');
         setTimeout(() => setMsg(''), 3000);
         return;
       }
 
       const res = await api.savePredictions('GROUPS', predictionsPayload);
       if (res.status === 'success') {
-        setMsg('¡Tus pronósticos de grupos se guardaron correctamente!');
+        setMsg('¡Tus pronósticos de grupos se enviaron con éxito! Las modificaciones para estos partidos han sido bloqueadas.');
         const newlySaved = new Set(savedPredictionIds);
         predictionsPayload.forEach(p => newlySaved.add(p.match_id));
         setSavedPredictionIds(newlySaved);
-        setTimeout(() => setMsg(''), 4000);
+        setTimeout(() => setMsg(''), 5000);
       }
     } catch (err: any) {
-      alert(err.message || 'Error al guardar pronósticos.');
+      alert(err.message || 'Error al enviar pronósticos.');
     } finally {
       setSaving(false);
     }
@@ -208,7 +208,7 @@ export const GroupPredictions: React.FC = () => {
     }
 
     setPredictions(autoPreds);
-    setMsg('Predicciones autocompletadas en pantalla. Recuerda hacer clic en "Guardar Pronósticos" para registrarlas oficialmente.');
+    setMsg('Predicciones autocompletadas en pantalla. Recuerda hacer clic en "Enviar Pronósticos" para registrarlas oficialmente.');
     setTimeout(() => setMsg(''), 6000);
   };
 
@@ -254,9 +254,9 @@ export const GroupPredictions: React.FC = () => {
             {saving ? (
               <RefreshCw className="animate-spin" style={{ width: '16px', height: '16px' }} />
             ) : (
-              <Save style={{ width: '16px', height: '16px' }} />
+              <Send style={{ width: '16px', height: '16px' }} />
             )}
-            Guardar Pronósticos
+            Enviar Pronósticos
           </button>
         </div>
       </div>

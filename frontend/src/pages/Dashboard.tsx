@@ -11,6 +11,19 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+const getSeedFromUrl = (url: string | null, fallback: string): string => {
+  if (!url) return fallback;
+  const match = url.match(/[?&]seed=([^&]+)/);
+  return match ? decodeURIComponent(match[1]) : fallback;
+};
+
+const getGenderFromUrl = (url: string | null): string => {
+  if (!url) return 'neutro';
+  if (url.includes('hair=short')) return 'masculino';
+  if (url.includes('hair=long')) return 'femenino';
+  return 'neutro';
+};
+
 export const Dashboard: React.FC = () => {
   const { user, updateUser } = useAuth();
   
@@ -18,7 +31,8 @@ export const Dashboard: React.FC = () => {
   const [profileName, setProfileName] = useState(user?.name || '');
   const [profileCountry, setProfileCountry] = useState(user?.country || '');
   const [profileTeam, setProfileTeam] = useState(user?.favorite_team || '');
-  const [avatarSeed, setAvatarSeed] = useState(user?.name || '');
+  const [avatarSeed, setAvatarSeed] = useState(user ? getSeedFromUrl(user.avatar_url, user.name) : '');
+  const [profileGender, setProfileGender] = useState(user ? getGenderFromUrl(user.avatar_url) : 'neutro');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
   
@@ -41,9 +55,23 @@ export const Dashboard: React.FC = () => {
         // Load matches
         const matchesRes = await api.getMatches();
         if (matchesRes.status === 'success') {
-          // Sort upcoming matches (finished = false)
-          const upcoming = matchesRes.matches.filter((m: any) => !m.finished).slice(0, 4);
-          setMatches(upcoming);
+          // Get upcoming matches with a 3-day leeway from the earliest unfinished match
+          const unfinished = matchesRes.matches.filter((m: any) => !m.finished);
+          if (unfinished.length > 0) {
+            const sortedUnfinished = [...unfinished].sort((a: any, b: any) => 
+              new Date(a.match_date).getTime() - new Date(b.match_date).getTime()
+            );
+            const earliestTime = new Date(sortedUnfinished[0].match_date).getTime();
+            const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+            const thresholdTime = earliestTime + threeDaysMs;
+            
+            const upcoming = sortedUnfinished.filter((m: any) => 
+              new Date(m.match_date).getTime() <= thresholdTime
+            );
+            setMatches(upcoming);
+          } else {
+            setMatches([]);
+          }
           
           // Count predictions
           const groupPreds = await api.getPredictions('GROUPS');
@@ -113,11 +141,27 @@ export const Dashboard: React.FC = () => {
     fetchData();
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || '');
+      setProfileCountry(user.country || '');
+      setProfileTeam(user.favorite_team || '');
+      setAvatarSeed(getSeedFromUrl(user.avatar_url, user.name || ''));
+      setProfileGender(getGenderFromUrl(user.avatar_url));
+    }
+  }, [user]);
+
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveSuccess('');
     
-    const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(avatarSeed)}`;
+    const baseAvatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(avatarSeed || 'user')}`;
+    let avatarUrl = baseAvatarUrl;
+    if (profileGender === 'masculino') {
+      avatarUrl = `${baseAvatarUrl}&hair=short01,short02,short03,short04,short05,short06,short07,short08,short09,short10,short11,short12,short13,short14,short15,short16,short17,short18,short19`;
+    } else if (profileGender === 'femenino') {
+      avatarUrl = `${baseAvatarUrl}&hair=long01,long02,long03,long04,long05,long06,long07,long08,long09,long10,long11,long12,long13,long14,long15,long16,long17,long18,long19,long20,long21,long22,long23,long24,long25,long26&features=blush,birthmark,freckles`;
+    }
     
     try {
       const response = await api.updateProfile({
@@ -241,6 +285,19 @@ export const Dashboard: React.FC = () => {
                 {teams.map(t => (
                   <option key={t.code} value={t.code}>{t.name}</option>
                 ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-profile-gender">Género del Avatar</label>
+              <select 
+                id="edit-profile-gender"
+                className="form-input" 
+                value={profileGender} 
+                onChange={(e) => setProfileGender(e.target.value)}
+              >
+                <option value="neutro">Neutro / Otro</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
               </select>
             </div>
             <div className="form-group">

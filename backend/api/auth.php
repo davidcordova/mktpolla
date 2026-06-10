@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $data['password'] ?? '';
         $country = trim($data['country'] ?? '');
         $favorite_team = trim($data['favorite_team'] ?? $data['favoriteTeam'] ?? '');
+        $avatar_url = trim($data['avatar_url'] ?? $data['avatarUrl'] ?? '');
         
         if (empty($name) || empty($email) || empty($password)) {
             sendError("Todos los campos obligatorios deben completarse.");
@@ -34,13 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Crear el usuario
         $password_hash = password_hash($password, PASSWORD_BCRYPT);
         $stmt = $db->prepare("
-            INSERT INTO users (name, email, password_hash, provider, country, favorite_team) 
-            VALUES (:name, :email, :password_hash, 'email', :country, :favorite_team)
+            INSERT INTO users (name, email, password_hash, provider, avatar_url, country, favorite_team) 
+            VALUES (:name, :email, :password_hash, 'email', :avatar_url, :country, :favorite_team)
         ");
         $stmt->execute([
             'name' => $name,
             'email' => $email,
             'password_hash' => $password_hash,
+            'avatar_url' => $avatar_url ?: null,
             'country' => $country ?: null,
             'favorite_team' => $favorite_team ?: null
         ]);
@@ -51,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "name" => $name,
             "email" => $email,
             "is_admin" => false,
+            "avatar_url" => $avatar_url ?: null,
             "country" => $country,
             "favorite_team" => $favorite_team,
             "champion_predicted_code" => null,
