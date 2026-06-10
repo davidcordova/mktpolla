@@ -91,6 +91,14 @@ public_html/
 > [!NOTE]
 > Puedes subir los archivos utilizando el **Administrador de Archivos (File Manager)** de cPanel comprimiéndolos en formato `.zip` localmente y descomprimiéndolos en el servidor, o usando un cliente FTP como **FileZilla**.
 
+> [!WARNING]
+> **Falso Positivo de Antivirus en cPanel (Sanesecurity.Foxhole.JS_Zip_2)**
+> El antivirus de cPanel (Imunify360 / ClamAV) a veces detecta erróneamente los archivos `.zip` que contienen código JavaScript minificado (como el bundle generado por Vite) como un supuesto virus falso positivo (`Sanesecurity.Foxhole.JS_Zip_2`). 
+> 
+> **Cómo solucionarlo**:
+> 1. **Método FTP (Recomendado)**: Utiliza un cliente FTP como **FileZilla** para subir la carpeta `assets` directamente sin comprimir en ZIP. Esto subirá los archivos `.js` y `.css` de uno en uno de forma transparente y evita el disparador de firmas basadas en archivos ZIP del hosting.
+> 2. **Método Web Directo**: En el Administrador de Archivos de tu cPanel, crea la carpeta `assets` de manera manual, entra en ella, presiona **Subir** (Upload) y arrastra los archivos individuales (`.js`, `.css`, etc.) que están dentro de tu carpeta local `frontend/dist/assets`. Subirlos descomprimidos no activará la alerta.
+
 ---
 
 ## 7. Configurar el Archivo `.htaccess` (Muy Importante)
