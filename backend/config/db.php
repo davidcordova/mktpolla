@@ -48,6 +48,10 @@ function getDBConnection() {
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
                 ]);
                 
+                // Crear y seleccionar la base de datos
+                $tempPdo->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                $tempPdo->exec("USE `" . DB_NAME . "`");
+                
                 // Cargar e inicializar base de datos usando schema.sql y seed.sql
                 $schemaPath = __DIR__ . '/../../database/schema.sql';
                 $seedPath = __DIR__ . '/../../database/seed.sql';

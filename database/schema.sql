@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS polla_mundialista_2026 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE polla_mundialista_2026;
-
 -- Desactivar llaves foráneas temporalmente para recrear tablas si es necesario
 SET FOREIGN_KEY_CHECKS = 0;
 

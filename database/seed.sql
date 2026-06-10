@@ -1,5 +1,3 @@
-USE polla_mundialista_2026;
-
 -- Limpiar datos existentes de equipos y partidos
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE ranking_history;
