@@ -26,10 +26,6 @@ INSERT INTO users (id, name, email, password_hash, is_admin, avatar_url, country
 (4, 'María Rodríguez', 'maria@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80', 'Argentina', 'ARG'),
 (5, 'Gustavo Díaz', 'gustavo@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80', 'Perú', 'ARG');
 
--- Asignar campeones predichos para usuarios demo
-UPDATE users SET champion_predicted_code = 'ARG' WHERE name IN ('David Silva', 'María Rodríguez', 'Gustavo Díaz');
-UPDATE users SET champion_predicted_code = 'BRA' WHERE name = 'Carlos Gómez';
-
 -- 2. Insertar Equipos (48 Países - 12 Grupos de 4)
 INSERT INTO teams (code, name, group_name, logo_url) VALUES
 ('USA', 'Estados Unidos', 'A', 'https://flagcdn.com/w80/us.png'),
@@ -81,8 +77,9 @@ INSERT INTO teams (code, name, group_name, logo_url) VALUES
 ('BOL', 'Bolivia', 'L', 'https://flagcdn.com/w80/bo.png'),
 ('NZL', 'Nueva Zelanda', 'L', 'https://flagcdn.com/w80/nz.png');
 
--- Relacionar campeón predicho en la tabla users
-ALTER TABLE users ADD CONSTRAINT fk_users_champion FOREIGN KEY (champion_predicted_code) REFERENCES teams(code) ON DELETE SET NULL;
+-- Asignar campeones predichos para usuarios demo (ahora que los equipos existen)
+UPDATE users SET champion_predicted_code = 'ARG' WHERE name IN ('David Silva', 'María Rodríguez', 'Gustavo Díaz');
+UPDATE users SET champion_predicted_code = 'BRA' WHERE name = 'Carlos Gómez';
 
 -- 3. Insertar Partidos de la Fase de Grupos (72 Partidos, 6 por Grupo)
 INSERT INTO matches (stage, group_name, team_a_code, team_b_code, match_date) VALUES
