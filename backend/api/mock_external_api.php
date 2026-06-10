@@ -10,25 +10,25 @@ $mockData = [
         // Grupo A
         [
             "stage" => "GROUPS",
-            "team_a" => "USA",
-            "team_b" => "PAN",
+            "team_a" => "MEX",
+            "team_b" => "RSA",
             "team_a_score" => 2,
             "team_b_score" => 1,
             "finished" => true
         ],
         [
             "stage" => "GROUPS",
-            "team_a" => "JAM",
-            "team_b" => "CIV",
+            "team_a" => "KOR",
+            "team_b" => "CZE",
             "team_a_score" => 1,
             "team_b_score" => 1,
             "finished" => true
         ],
-        // Grupo B
+        // Grupo D
         [
             "stage" => "GROUPS",
-            "team_a" => "MEX",
-            "team_b" => "ECU",
+            "team_a" => "USA",
+            "team_b" => "PAR",
             "team_a_score" => 3,
             "team_b_score" => 2,
             "finished" => true
@@ -36,7 +36,7 @@ $mockData = [
         [
             "stage" => "GROUPS",
             "team_a" => "AUS",
-            "team_b" => "NGA",
+            "team_b" => "TUR",
             "team_a_score" => 0,
             "team_b_score" => 2,
             "finished" => true

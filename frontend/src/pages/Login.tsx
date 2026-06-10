@@ -58,8 +58,8 @@ export const Login: React.FC<LoginProps> = ({ onRegisterClick }) => {
           }}>
             <Trophy style={{ color: 'var(--color-gold)', width: '36px', height: '36px' }} />
           </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }} className="gradient-text-gold">Polla Mundialista</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Predice el Mundial 2026 y gana con tus amigos</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800' }} className="gradient-text-gold">Polla Mundialista 2026</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Predice el Mundial 2026 y acumula puntos. Campaña exclusiva y premiada por <strong>Marketing Alterno</strong>.</p>
         </div>
 
         {error && (

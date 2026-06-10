@@ -129,6 +129,7 @@ export const Rules: React.FC = () => {
       <div className="glass-panel" style={{ padding: '24px', background: 'var(--rgba-white-01)' }}>
         <h3 style={{ fontSize: '1.25rem', marginBottom: '12px' }}>Notas Importantes</h3>
         <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <li>Este sistema es exclusivo para el <strong>Mundial 2026</strong>. Los puntos acumulados serán premiados por la empresa promotora <strong>Marketing Alterno</strong> al finalizar el torneo.</li>
           <li>En la <strong>Fase de Grupos</strong>, seleccionar el resultado 1X2 (gana local, empate o gana visitante) es <strong>obligatorio</strong>. Colocar el marcador de goles exacto es <strong>opcional</strong>.</li>
           <li>Si ingresas el marcador exacto y lo aciertas, sumas <strong>+1 punto adicional</strong> en ese partido (+1 punto por resultado + 1 punto por marcador = total 2 puntos).</li>
           <li>En la <strong>Fase Eliminatoria</strong> (de 16avos de final en adelante), debes pronosticar obligatoriamente un ganador. Si hay empate en tiempo regular, los penales deciden qué equipo avanza.</li>

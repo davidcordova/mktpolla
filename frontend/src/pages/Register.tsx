@@ -43,18 +43,54 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
   ];
 
   const teams = [
-    { code: 'USA', name: 'Estados Unidos' },
-    { code: 'MEX', name: 'México' },
-    { code: 'CAN', name: 'Canadá' },
-    { code: 'ARG', name: 'Argentina' },
-    { code: 'BRA', name: 'Brasil' },
-    { code: 'COL', name: 'Colombia' },
-    { code: 'ESP', name: 'España' },
-    { code: 'FRA', name: 'Francia' },
     { code: 'GER', name: 'Alemania' },
-    { code: 'ITA', name: 'Italia' },
+    { code: 'DZA', name: 'Argelia' },
+    { code: 'KSA', name: 'Arabia Saudita' },
+    { code: 'ARG', name: 'Argentina' },
+    { code: 'AUS', name: 'Australia' },
+    { code: 'AUT', name: 'Austria' },
+    { code: 'BEL', name: 'Bélgica' },
+    { code: 'BIH', name: 'Bosnia y Herzegovina' },
+    { code: 'BRA', name: 'Brasil' },
+    { code: 'CPV', name: 'Cabo Verde' },
+    { code: 'CAN', name: 'Canadá' },
+    { code: 'QAT', name: 'Catar' },
+    { code: 'CZE', name: 'Chequia' },
+    { code: 'COL', name: 'Colombia' },
+    { code: 'KOR', name: 'Corea del Sur' },
+    { code: 'CIV', name: 'Costa de Marfil' },
+    { code: 'CRO', name: 'Croacia' },
+    { code: 'CUW', name: 'Curazao' },
+    { code: 'ECU', name: 'Ecuador' },
+    { code: 'EGY', name: 'Egipto' },
+    { code: 'SCO', name: 'Escocia' },
+    { code: 'ESP', name: 'España' },
+    { code: 'USA', name: 'Estados Unidos' },
+    { code: 'FRA', name: 'Francia' },
+    { code: 'GHA', name: 'Ghana' },
+    { code: 'HAI', name: 'Haití' },
+    { code: 'ENG', name: 'Inglaterra' },
+    { code: 'IRN', name: 'Irán' },
+    { code: 'IRQ', name: 'Irak' },
+    { code: 'JPN', name: 'Japón' },
+    { code: 'JOR', name: 'Jordania' },
+    { code: 'MAR', name: 'Marruecos' },
+    { code: 'MEX', name: 'México' },
+    { code: 'NOR', name: 'Noruega' },
+    { code: 'NZL', name: 'Nueva Zelanda' },
+    { code: 'NED', name: 'Países Bajos' },
+    { code: 'PAN', name: 'Panamá' },
+    { code: 'PAR', name: 'Paraguay' },
     { code: 'POR', name: 'Portugal' },
+    { code: 'COD', name: 'RD Congo' },
+    { code: 'SEN', name: 'Senegal' },
+    { code: 'RSA', name: 'Sudáfrica' },
+    { code: 'SWE', name: 'Suecia' },
+    { code: 'SUI', name: 'Suiza' },
+    { code: 'TUN', name: 'Túnez' },
+    { code: 'TUR', name: 'Turquía' },
     { code: 'URU', name: 'Uruguay' },
+    { code: 'UZB', name: 'Uzbekistán' }
   ];
 
   return (
@@ -87,7 +123,7 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
             <Trophy style={{ color: 'var(--color-emerald)', width: '36px', height: '36px' }} />
           </div>
           <h1 style={{ fontSize: '2rem', fontWeight: '800' }} className="gradient-text-emerald">Únete a la Competencia</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Crea tu cuenta gratis en menos de un minuto</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Crea tu cuenta para la Polla Mundialista 2026. Premios patrocinados por <strong>Marketing Alterno</strong>.</p>
         </div>
 
         {error && (

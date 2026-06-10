@@ -1,8 +1,8 @@
 // frontend/src/pages/BracketPredictions.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api, getFlagUrl as getFlagUrlBase } from '../services/api';
-import { Save, Info, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Save, Info, RefreshCw, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BracketMatch {
   teamA: string;
@@ -35,19 +35,132 @@ export const BracketPredictions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
+  const [isBracketLocked, setIsBracketLocked] = useState(true);
+
+  // Drag-to-scroll, keyboard navigation, and chevron state & handlers
+  const bracketRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
+
+  // Drag distance tracking to avoid clicking while dragging
+  const hasDragged = useRef(false);
+  const dragStartPos = useRef({ x: 0, y: 0 });
+
+  // Floating navigation button states
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [showScrollControls, setShowScrollControls] = useState(false);
+
+  const updateScrollButtons = () => {
+    if (bracketRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = bracketRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      setShowScrollControls(scrollWidth > clientWidth);
+    }
+  };
+
+  const scrollBracket = (direction: 'left' | 'right') => {
+    if (bracketRef.current) {
+      const scrollAmount = 450; // Scroll by roughly two columns
+      const amount = direction === 'left' ? -scrollAmount : scrollAmount;
+      bracketRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!bracketRef.current) return;
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'BUTTON') return;
+    
+    setIsDragging(true);
+    const startXVal = e.pageX - bracketRef.current.offsetLeft;
+    setStartX(startXVal);
+    setScrollLeftState(bracketRef.current.scrollLeft);
+    
+    dragStartPos.current = { x: e.pageX, y: e.pageY };
+    hasDragged.current = false;
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    hasDragged.current = false;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setTimeout(() => {
+      hasDragged.current = false;
+    }, 50);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !bracketRef.current) return;
+    
+    const currentX = e.pageX;
+    const currentY = e.pageY;
+    const distance = Math.sqrt(
+      Math.pow(currentX - dragStartPos.current.x, 2) + 
+      Math.pow(currentY - dragStartPos.current.y, 2)
+    );
+    
+    if (distance > 5) {
+      hasDragged.current = true;
+    }
+    
+    if (hasDragged.current) {
+      e.preventDefault();
+      const x = e.pageX - bracketRef.current.offsetLeft;
+      const walk = (x - startX) * 1.5; // Drag speed multiplier
+      bracketRef.current.scrollLeft = scrollLeftState - walk;
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!bracketRef.current) return;
+    const scrollAmount = 150; // Keyboard scroll speed
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      bracketRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      bracketRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  // Keyboard scroll global listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (!bracketRef.current) return;
+      
+      // Ignore if focus is in an input or select
+      const activeTag = document.activeElement?.tagName;
+      if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') {
+        return;
+      }
+      
+      const scrollAmount = 250; // Keyboard scroll speed
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        bracketRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        bracketRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, []);
+
   
   // To allow easy team logo rendering, we'll keep a code-to-name/logo dictionary
   const [teamsMap, setTeamsMap] = useState<{ [code: string]: { name: string, logo: string } }>({});
 
   const stageOrder: (keyof BracketState)[] = ['ROUND_OF_32', 'ROUND_OF_16', 'QUARTERS', 'SEMIS', 'FINAL'];
-  
-  // Default teams for initialization if database is empty/not simulated yet
-  const defaultSeeds = [
-    'USA', 'PAN', 'MEX', 'ECU', 'CAN', 'PER', 'ARG', 'ENG', 
-    'BRA', 'GER', 'FRA', 'COL', 'ESP', 'URU', 'ITA', 'CHI',
-    'POR', 'NED', 'BEL', 'CRO', 'UKR', 'SUI', 'DEN', 'SWE',
-    'CIV', 'NGA', 'MAR', 'SEN', 'GHA', 'EGY', 'DZA', 'CMR'
-  ];
 
   useEffect(() => {
     const loadData = async () => {
@@ -69,9 +182,9 @@ export const BracketPredictions: React.FC = () => {
         const predsRes = await api.getPredictions('ELIMINATORY');
         
         let initialBracket: BracketState = {
-          ROUND_OF_32: Array(16).fill(null).map((_, i) => ({ 
-            teamA: defaultSeeds[i * 2] || '', 
-            teamB: defaultSeeds[i * 2 + 1] || '', 
+          ROUND_OF_32: Array(16).fill(null).map(() => ({ 
+            teamA: '', 
+            teamB: '', 
             winner: '',
             predicted_team_a_score: '',
             predicted_team_b_score: ''
@@ -85,10 +198,13 @@ export const BracketPredictions: React.FC = () => {
         // If knockout matches have actually been generated by admin, use them to overwrite ROUND_OF_32 teams
         const actualKoMatches = matchesRes.matches.filter((m: any) => m.stage === 'ROUND_OF_32');
         if (actualKoMatches.length === 16) {
+          setIsBracketLocked(false);
           actualKoMatches.forEach((m: any, idx: number) => {
             initialBracket.ROUND_OF_32[idx].teamA = m.team_a_code;
             initialBracket.ROUND_OF_32[idx].teamB = m.team_b_code;
           });
+        } else {
+          setIsBracketLocked(true);
         }
 
         const savedNodes: typeof savedBracketNodes = {};
@@ -342,7 +458,13 @@ export const BracketPredictions: React.FC = () => {
     return (
       <div 
         className={`bracket-team ${isWinner ? 'winner-predicted' : ''}`}
-        onClick={() => handleSelectWinner(stage, matchIdx, teamCode)}
+        onClick={(e) => {
+          if (hasDragged.current) {
+            e.stopPropagation();
+            return;
+          }
+          handleSelectWinner(stage, matchIdx, teamCode);
+        }}
         style={{ pointerEvents: (teamCode && !isSaved) ? 'auto' : 'none', opacity: teamCode ? 1 : 0.5 }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
@@ -429,7 +551,7 @@ export const BracketPredictions: React.FC = () => {
           id="btn-save-bracket"
           onClick={handleSave} 
           className="btn-primary"
-          disabled={saving}
+          disabled={saving || isBracketLocked}
         >
           {saving ? (
             <RefreshCw className="animate-spin" style={{ width: '16px', height: '16px' }} />
@@ -466,6 +588,26 @@ export const BracketPredictions: React.FC = () => {
         </div>
       </div>
 
+      {isBracketLocked && (
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          background: 'rgba(230, 126, 34, 0.08)',
+          padding: '16px',
+          borderRadius: '8px',
+          border: '1px solid rgba(230, 126, 34, 0.25)',
+          color: '#f39c12',
+          fontSize: '0.9rem',
+          fontWeight: '600',
+          alignItems: 'center'
+        }}>
+          <Info style={{ color: '#f39c12', flexShrink: 0 }} />
+          <div>
+            La fase de grupos aún no ha concluido y las llaves de octavos/dieciseisavos no han sido definidas oficialmente. Podrás ingresar tus pronósticos una vez el administrador finalice la fase de grupos.
+          </div>
+        </div>
+      )}
+
       {/* Champion display */}
       {champion && (
         <div className="glass-panel glass-panel-glow-gold animate-fade-in" style={{
@@ -489,86 +631,169 @@ export const BracketPredictions: React.FC = () => {
         </div>
       )}
 
-      {/* Bracket visualizer */}
-      <div className="bracket-container" style={{ paddingBottom: '40px' }}>
-        
-        {/* LEFT ROUND OF 32 */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>16avos</h4>
-          <div className="bracket-matches-col">
-            {bracket.ROUND_OF_32.slice(0, 8).map((_, idx) => renderBracketMatch('ROUND_OF_32', idx, `r32-l-${idx}`))}
-          </div>
-        </div>
+      {/* Bracket visualizer wrapper */}
+      <div style={{ position: 'relative', width: '100%' }}>
+        {showScrollControls && (
+          <>
+            <button
+              onClick={() => scrollBracket('left')}
+              className={`bracket-scroll-btn scroll-left ${canScrollLeft ? 'visible' : ''}`}
+              aria-label="Desplazar a la izquierda"
+              style={{
+                position: 'absolute',
+                left: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'var(--bg-secondary)',
+                backdropFilter: 'var(--glass-backdrop)',
+                border: '1px solid var(--border-glow)',
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                opacity: canScrollLeft ? 0.95 : 0,
+                pointerEvents: canScrollLeft ? 'auto' : 'none',
+                transition: 'var(--transition-smooth)',
+                boxShadow: 'var(--box-shadow)'
+              }}
+            >
+              <ChevronLeft style={{ width: '24px', height: '24px' }} />
+            </button>
+            
+            <button
+              onClick={() => scrollBracket('right')}
+              className={`bracket-scroll-btn scroll-right ${canScrollRight ? 'visible' : ''}`}
+              aria-label="Desplazar a la derecha"
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'var(--bg-secondary)',
+                backdropFilter: 'var(--glass-backdrop)',
+                border: '1px solid var(--border-glow)',
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                opacity: canScrollRight ? 0.95 : 0,
+                pointerEvents: canScrollRight ? 'auto' : 'none',
+                transition: 'var(--transition-smooth)',
+                boxShadow: 'var(--box-shadow)'
+              }}
+            >
+              <ChevronRight style={{ width: '24px', height: '24px' }} />
+            </button>
+          </>
+        )}
 
-        {/* LEFT ROUND OF 16 */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>8avos</h4>
-          <div className="bracket-matches-col">
-            {bracket.ROUND_OF_16.slice(0, 4).map((_, idx) => renderBracketMatch('ROUND_OF_16', idx, `r16-l-${idx}`))}
+        <div 
+          ref={bracketRef}
+          className="bracket-container" 
+          tabIndex={0}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          onKeyDown={handleKeyDown}
+          onScroll={updateScrollButtons}
+          style={{ 
+            paddingBottom: '40px',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: isDragging ? 'none' : 'auto',
+            outline: 'none'
+          }}
+        >
+          
+          {/* LEFT ROUND OF 32 */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>16avos</h4>
+            <div className="bracket-matches-col">
+              {bracket.ROUND_OF_32.slice(0, 8).map((_, idx) => renderBracketMatch('ROUND_OF_32', idx, `r32-l-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* LEFT QUARTERS */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>4tos</h4>
-          <div className="bracket-matches-col">
-            {bracket.QUARTERS.slice(0, 2).map((_, idx) => renderBracketMatch('QUARTERS', idx, `q-l-${idx}`))}
+          {/* LEFT ROUND OF 16 */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>8avos</h4>
+            <div className="bracket-matches-col">
+              {bracket.ROUND_OF_16.slice(0, 4).map((_, idx) => renderBracketMatch('ROUND_OF_16', idx, `r16-l-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* LEFT SEMIS */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>Semis</h4>
-          <div className="bracket-matches-col">
-            {bracket.SEMIS.slice(0, 1).map((_, idx) => renderBracketMatch('SEMIS', idx, `s-l-${idx}`))}
+          {/* LEFT QUARTERS */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>4tos</h4>
+            <div className="bracket-matches-col">
+              {bracket.QUARTERS.slice(0, 2).map((_, idx) => renderBracketMatch('QUARTERS', idx, `q-l-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* CENTER FINAL */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>FINAL</h4>
-          <div className="bracket-matches-col">
-            {bracket.FINAL.map((_, idx) => renderBracketMatch('FINAL', idx, `f-${idx}`, {
-              borderColor: savedBracketNodes['FINAL-0'] ? 'rgba(34, 153, 84, 0.4)' : 'var(--border-glow)',
-              boxShadow: '0 0 20px rgba(241,196,15,0.1)'
-            }))}
+          {/* LEFT SEMIS */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>Semis</h4>
+            <div className="bracket-matches-col">
+              {bracket.SEMIS.slice(0, 1).map((_, idx) => renderBracketMatch('SEMIS', idx, `s-l-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT SEMIS */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>Semis</h4>
-          <div className="bracket-matches-col">
-            {bracket.SEMIS.slice(1, 2).map((_, idx) => renderBracketMatch('SEMIS', idx + 1, `s-r-${idx}`))}
+          {/* CENTER FINAL */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>FINAL</h4>
+            <div className="bracket-matches-col">
+              {bracket.FINAL.map((_, idx) => renderBracketMatch('FINAL', idx, `f-${idx}`, {
+                borderColor: savedBracketNodes['FINAL-0'] ? 'rgba(34, 153, 84, 0.4)' : 'var(--border-glow)',
+                boxShadow: '0 0 20px rgba(241,196,15,0.1)'
+              }))}
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT QUARTERS */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>4tos</h4>
-          <div className="bracket-matches-col">
-            {bracket.QUARTERS.slice(2, 4).map((_, idx) => renderBracketMatch('QUARTERS', idx + 2, `q-r-${idx}`))}
+          {/* RIGHT SEMIS */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>Semis</h4>
+            <div className="bracket-matches-col">
+              {bracket.SEMIS.slice(1, 2).map((_, idx) => renderBracketMatch('SEMIS', idx + 1, `s-r-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT ROUND OF 16 */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>8avos</h4>
-          <div className="bracket-matches-col">
-            {bracket.ROUND_OF_16.slice(4, 8).map((_, idx) => renderBracketMatch('ROUND_OF_16', idx + 4, `r16-r-${idx}`))}
+          {/* RIGHT QUARTERS */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>4tos</h4>
+            <div className="bracket-matches-col">
+              {bracket.QUARTERS.slice(2, 4).map((_, idx) => renderBracketMatch('QUARTERS', idx + 2, `q-r-${idx}`))}
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT ROUND OF 32 */}
-        <div className="bracket-round">
-          <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>16avos</h4>
-          <div className="bracket-matches-col">
-            {bracket.ROUND_OF_32.slice(8, 16).map((_, idx) => renderBracketMatch('ROUND_OF_32', idx + 8, `r32-r-${idx}`))}
+          {/* RIGHT ROUND OF 16 */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>8avos</h4>
+            <div className="bracket-matches-col">
+              {bracket.ROUND_OF_16.slice(4, 8).map((_, idx) => renderBracketMatch('ROUND_OF_16', idx + 4, `r16-r-${idx}`))}
+            </div>
           </div>
-        </div>
 
+          {/* RIGHT ROUND OF 32 */}
+          <div className="bracket-round">
+            <h4 style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '16px' }}>16avos</h4>
+            <div className="bracket-matches-col">
+              {bracket.ROUND_OF_32.slice(8, 16).map((_, idx) => renderBracketMatch('ROUND_OF_32', idx + 8, `r32-r-${idx}`))}
+            </div>
+          </div>
+
+        </div>
       </div>
       
     </div>
   );
 };
+

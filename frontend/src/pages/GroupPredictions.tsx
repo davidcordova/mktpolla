@@ -166,7 +166,7 @@ export const GroupPredictions: React.FC = () => {
     }
   };
 
-  const handleAutocomplete = async () => {
+  const handleAutocomplete = () => {
     const autoPreds: typeof predictions = { ...predictions };
     let hasNew = false;
     
@@ -192,36 +192,8 @@ export const GroupPredictions: React.FC = () => {
     }
 
     setPredictions(autoPreds);
-    setMsg('Autocompletado listo. Guardando predicciones...');
-    
-    // Auto save
-    setSaving(true);
-    try {
-      const predictionsPayload = Object.keys(autoPreds)
-        .filter(matchId => {
-          const mId = parseInt(matchId, 10);
-          return !savedPredictionIds.has(mId);
-        })
-        .map(matchId => ({
-          match_id: parseInt(matchId, 10),
-          prediction: autoPreds[parseInt(matchId, 10)].prediction,
-          predicted_team_a_score: autoPreds[parseInt(matchId, 10)].predicted_team_a_score,
-          predicted_team_b_score: autoPreds[parseInt(matchId, 10)].predicted_team_b_score
-        }));
-      
-      const res = await api.savePredictions('GROUPS', predictionsPayload);
-      if (res.status === 'success') {
-        setMsg('¡Autocompletado con éxito y guardado en la base de datos!');
-        const newlySaved = new Set(savedPredictionIds);
-        predictionsPayload.forEach(p => newlySaved.add(p.match_id));
-        setSavedPredictionIds(newlySaved);
-        setTimeout(() => setMsg(''), 4000);
-      }
-    } catch (err: any) {
-      alert(err.message || 'Error al guardar pronósticos autocompletados.');
-    } finally {
-      setSaving(false);
-    }
+    setMsg('Predicciones autocompletadas en pantalla. Recuerda hacer clic en "Guardar Pronósticos" para registrarlas oficialmente.');
+    setTimeout(() => setMsg(''), 6000);
   };
 
   // Filter matches for active group

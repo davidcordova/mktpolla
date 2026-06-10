@@ -147,76 +147,76 @@ try {
     // Seed Teams (48 teams: 12 groups A to L, 4 teams per group)
     $groups = [
         'A' => [
-            ['USA', 'Estados Unidos'],
-            ['PAN', 'Panamá'],
-            ['JAM', 'Jamaica'],
-            ['CIV', 'Costa de Marfil']
+            ['MEX', 'México', 'mx'],
+            ['RSA', 'Sudáfrica', 'za'],
+            ['KOR', 'Corea del Sur', 'kr'],
+            ['CZE', 'Chequia', 'cz']
         ],
         'B' => [
-            ['MEX', 'México'],
-            ['ECU', 'Ecuador'],
-            ['AUS', 'Australia'],
-            ['NGA', 'Nigeria']
+            ['CAN', 'Canadá', 'ca'],
+            ['SUI', 'Suiza', 'ch'],
+            ['QAT', 'Catar', 'qa'],
+            ['BIH', 'Bosnia y Herzegovina', 'ba']
         ],
         'C' => [
-            ['CAN', 'Canadá'],
-            ['PER', 'Perú'],
-            ['MAR', 'Marruecos'],
-            ['JPN', 'Japón']
+            ['BRA', 'Brasil', 'br'],
+            ['MAR', 'Marruecos', 'ma'],
+            ['SCO', 'Escocia', 'gb-sct'],
+            ['HAI', 'Haití', 'ht']
         ],
         'D' => [
-            ['ARG', 'Argentina'],
-            ['ENG', 'Inglaterra'],
-            ['SEN', 'Senegal'],
-            ['KOR', 'Corea del Sur']
+            ['USA', 'Estados Unidos', 'us'],
+            ['PAR', 'Paraguay', 'py'],
+            ['AUS', 'Australia', 'au'],
+            ['TUR', 'Turquía', 'tr']
         ],
         'E' => [
-            ['BRA', 'Brasil'],
-            ['GER', 'Alemania'],
-            ['GHA', 'Ghana'],
-            ['IRN', 'Irán']
+            ['CUW', 'Curazao', 'cw'],
+            ['ECU', 'Ecuador', 'ec'],
+            ['GER', 'Alemania', 'de'],
+            ['CIV', 'Costa de Marfil', 'ci']
         ],
         'F' => [
-            ['FRA', 'Francia'],
-            ['COL', 'Colombia'],
-            ['EGY', 'Egipto'],
-            ['KSA', 'Arabia Saudita']
+            ['NED', 'Países Bajos', 'nl'],
+            ['JPN', 'Japón', 'jp'],
+            ['SWE', 'Suecia', 'se'],
+            ['TUN', 'Túnez', 'tn']
         ],
         'G' => [
-            ['ESP', 'España'],
-            ['URU', 'Uruguay'],
-            ['DZA', 'Argelia'],
-            ['IRQ', 'Irak']
+            ['BEL', 'Bélgica', 'be'],
+            ['EGY', 'Egipto', 'eg'],
+            ['IRN', 'Irán', 'ir'],
+            ['NZL', 'Nueva Zelanda', 'nz']
         ],
         'H' => [
-            ['ITA', 'Italia'],
-            ['CHI', 'Chile'],
-            ['CMR', 'Camerún'],
-            ['QAT', 'Catar']
+            ['ESP', 'España', 'es'],
+            ['CPV', 'Cabo Verde', 'cv'],
+            ['KSA', 'Arabia Saudita', 'sa'],
+            ['URU', 'Uruguay', 'uy']
         ],
         'I' => [
-            ['POR', 'Portugal'],
-            ['NED', 'Países Bajos'],
-            ['CRC', 'Costa Rica'],
-            ['RSA', 'Sudáfrica']
+            ['FRA', 'Francia', 'fr'],
+            ['SEN', 'Senegal', 'sn'],
+            ['IRQ', 'Irak', 'iq'],
+            ['NOR', 'Noruega', 'no']
         ],
         'J' => [
-            ['BEL', 'Bélgica'],
-            ['CRO', 'Croacia'],
-            ['PAR', 'Paraguay'],
-            ['TUN', 'Túnez']
+            ['ARG', 'Argentina', 'ar'],
+            ['DZA', 'Argelia', 'dz'],
+            ['AUT', 'Austria', 'at'],
+            ['JOR', 'Jordania', 'jo']
         ],
         'K' => [
-            ['UKR', 'Ucrania'],
-            ['SUI', 'Suiza'],
-            ['VEN', 'Venezuela'],
-            ['MLI', 'Malí']
+            ['POR', 'Portugal', 'pt'],
+            ['COD', 'RD Congo', 'cd'],
+            ['UZB', 'Uzbekistán', 'uz'],
+            ['COL', 'Colombia', 'co']
         ],
         'L' => [
-            ['DEN', 'Dinamarca'],
-            ['SWE', 'Suecia'],
-            ['BOL', 'Bolivia'],
-            ['NZL', 'Nueva Zelanda']
+            ['ENG', 'Inglaterra', 'gb-eng'],
+            ['CRO', 'Croacia', 'hr'],
+            ['GHA', 'Ghana', 'gh'],
+            ['PAN', 'Panamá', 'pa']
         ]
     ];
     
@@ -226,30 +226,8 @@ try {
         foreach ($teamsList as $team) {
             $code = $team[0];
             $name = $team[1];
-            $logoUrl = "https://flagcdn.com/w80/" . strtolower(substr($code, 0, 2)) . ".png";
-            // Adjust exceptions for flags
-            if ($code === 'USA') $logoUrl = "https://flagcdn.com/w80/us.png";
-            if ($code === 'MEX') $logoUrl = "https://flagcdn.com/w80/mx.png";
-            if ($code === 'JAM') $logoUrl = "https://flagcdn.com/w80/jm.png";
-            if ($code === 'SEN') $logoUrl = "https://flagcdn.com/w80/sn.png";
-            if ($code === 'KOR') $logoUrl = "https://flagcdn.com/w80/kr.png";
-            if ($code === 'IRQ') $logoUrl = "https://flagcdn.com/w80/iq.png";
-            if ($code === 'TUN') $logoUrl = "https://flagcdn.com/w80/tn.png";
-            if ($code === 'UKR') $logoUrl = "https://flagcdn.com/w80/ua.png";
-            if ($code === 'ENG') $logoUrl = "https://flagcdn.com/w80/gb-eng.png";
-            if ($code === 'GER') $logoUrl = "https://flagcdn.com/w80/de.png";
-            if ($code === 'POR') $logoUrl = "https://flagcdn.com/w80/pt.png";
-            if ($code === 'DEN') $logoUrl = "https://flagcdn.com/w80/dk.png";
-            if ($code === 'CRO') $logoUrl = "https://flagcdn.com/w80/hr.png";
-            if ($code === 'SUI') $logoUrl = "https://flagcdn.com/w80/ch.png";
-            if ($code === 'SWE') $logoUrl = "https://flagcdn.com/w80/se.png";
-            if ($code === 'RSA') $logoUrl = "https://flagcdn.com/w80/za.png";
-            if ($code === 'NGA') $logoUrl = "https://flagcdn.com/w80/ng.png";
-            if ($code === 'KSA') $logoUrl = "https://flagcdn.com/w80/sa.png";
-            if ($code === 'CHI') $logoUrl = "https://flagcdn.com/w80/cl.png";
-            if ($code === 'URU') $logoUrl = "https://flagcdn.com/w80/uy.png";
-            if ($code === 'PAR') $logoUrl = "https://flagcdn.com/w80/py.png";
-            
+            $iso = $team[2];
+            $logoUrl = "https://flagcdn.com/w80/" . $iso . ".png";
             $stmtTeam->execute([$code, $name, $groupChar, $logoUrl]);
         }
     }
