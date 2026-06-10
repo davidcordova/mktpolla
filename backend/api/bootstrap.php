@@ -7,7 +7,7 @@ if (!isset($_SERVER['REQUEST_METHOD'])) {
 }
 
 // Enable error reporting for debugging, but in JSON
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
