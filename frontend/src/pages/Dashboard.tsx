@@ -72,26 +72,31 @@ export const Dashboard: React.FC = () => {
         
         // Fetch champion predicted status
         if (user?.champion_predicted_id) {
-          // Find the predicted team in our database
-          const rankingsRes = await api.getRankings();
-          if (rankingsRes.status === 'success') {
-            const selfRank = rankingsRes.rankings.find((r: any) => r.user_id === user.id);
-            if (selfRank) {
-              // Get team details
-              const predictedId = user.champion_predicted_id;
-              // Simple API fallback or details lookup
-              // We can find team name in uniqueTeams
-              const teamDetail = uniqueTeams.find(t => t.code === predictedId);
-              if (teamDetail) {
-                setChampionTeam({
-                  code: predictedId,
-                  name: teamDetail.name,
-                  logo: teamDetail.logo,
-                  alive: selfRank.champion ? selfRank.champion.active : true
-                });
+          const predictedId = user.champion_predicted_id;
+          const teamDetail = uniqueTeams.find(t => t.code === predictedId);
+          if (teamDetail) {
+            let isAlive = true;
+            try {
+              const rankingsRes = await api.getRankings();
+              if (rankingsRes.status === 'success') {
+                const selfRank = rankingsRes.rankings.find((r: any) => Number(r.user_id) === Number(user.id));
+                if (selfRank && selfRank.champion) {
+                  isAlive = selfRank.champion.active;
+                }
               }
+            } catch (rErr) {
+              console.error('Error fetching rankings for champion status:', rErr);
             }
+            
+            setChampionTeam({
+              code: predictedId,
+              name: teamDetail.name,
+              logo: teamDetail.logo,
+              alive: isAlive
+            });
           }
+        } else {
+          setChampionTeam(null);
         }
         
       } catch (err) {
