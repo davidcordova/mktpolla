@@ -29,14 +29,29 @@ La aplicación frontend de React ya ha sido compilada. Los archivos compilados y
 
 ## 4. Configurar Conexión en el Backend de PHP
 
-Abre el archivo [backend/config/db.php](file:///c:/Users/LuisDavidCordovaLope/Documents/mkt/mktpolla/backend/config/db.php) en el Administrador de Archivos de tu cPanel o modifícalo localmente y actualiza los parámetros de conexión de producción con los datos creados en el punto anterior:
+El archivo [backend/config/db.php](file:///c:/Users/LuisDavidCordovaLope/Documents/mkt/mktpolla/backend/config/db.php) ya cuenta con un sistema de **detección dinámica de entorno** (desarrollo local vs producción). 
 
+Las credenciales que proporcionaste para producción ya están configuradas de forma predeterminada:
+* **Usuario**: `alterno_mktpolla`
+* **Base de datos**: `alterno_mktpolla`
+* **Contraseña**: `M1un1c4cl4v3`
+
+El archivo define automáticamente la conexión dependiendo de dónde esté corriendo:
 ```php
-define('DB_HOST', 'localhost'); // En la gran mayoría de hostings es localhost
-define('DB_USER', 'miusuario_admin'); // Tu usuario creado en cPanel
-define('DB_PASS', 'tu_contraseña_segura'); // Contraseña del usuario
-define('DB_NAME', 'miusuario_polla2026'); // Nombre exacto de tu Base de Datos
+if ($isLocal) {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'polla_mundialista_2026');
+} else {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'alterno_mktpolla');
+    define('DB_PASS', 'M1un1c4cl4v3');
+    define('DB_NAME', 'alterno_mktpolla');
+}
 ```
+*Si en el futuro cambias el usuario o contraseña de tu cPanel, solo debes actualizar este bloque en el archivo `backend/config/db.php`.*
+
 
 ---
 
