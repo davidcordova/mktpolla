@@ -29,6 +29,7 @@ export const Dashboard: React.FC = () => {
   const [bracketPredCount, setBracketPredCount] = useState(0);
   const [championTeam, setChampionTeam] = useState<any>(null);
   const [isChangingChampion, setIsChangingChampion] = useState(false);
+  const [selectedTempChampion, setSelectedTempChampion] = useState('');
   
   const [loading, setLoading] = useState(true);
 
@@ -95,9 +96,11 @@ export const Dashboard: React.FC = () => {
               logo: teamDetail.logo,
               alive: isAlive
             });
+            setSelectedTempChampion(predictedId);
           }
         } else {
           setChampionTeam(null);
+          setSelectedTempChampion('');
         }
         
       } catch (err) {
@@ -363,7 +366,10 @@ export const Dashboard: React.FC = () => {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={() => setIsChangingChampion(true)}
+                onClick={() => {
+                  setSelectedTempChampion(championTeam.code);
+                  setIsChangingChampion(true);
+                }}
                 style={{ padding: '6px 12px', fontSize: '0.78rem', marginTop: '4px' }}
               >
                 Cambiar Selección
@@ -374,32 +380,48 @@ export const Dashboard: React.FC = () => {
               <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
                 {championTeam ? 'Selecciona un nuevo campeón predicho:' : 'Aún no has elegido a tu campeón predicho. ¡Elige uno ahora!'}
               </span>
-              <div className="form-group" style={{ margin: '0', display: 'flex', gap: '8px' }}>
+              <div className="form-group" style={{ margin: '0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <select 
                   id="select-champion-quick"
                   className="form-input" 
-                  onChange={(e) => {
-                    handleChampionSelect(e.target.value);
-                    setIsChangingChampion(false);
-                  }}
-                  defaultValue={championTeam?.code || ""}
-                  style={{ flex: 1 }}
+                  onChange={(e) => setSelectedTempChampion(e.target.value)}
+                  value={selectedTempChampion}
+                  style={{ width: '100%' }}
                 >
                   <option value="" disabled>Selecciona tu Campeón...</option>
                   {teams.map(t => (
                     <option key={t.code} value={t.code}>{t.name}</option>
                   ))}
                 </select>
-                {championTeam && (
+                <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <button
                     type="button"
-                    className="btn-secondary"
-                    onClick={() => setIsChangingChampion(false)}
-                    style={{ padding: '0 12px' }}
+                    className="btn-accent"
+                    onClick={async () => {
+                      if (selectedTempChampion) {
+                        await handleChampionSelect(selectedTempChampion);
+                        setIsChangingChampion(false);
+                      }
+                    }}
+                    disabled={!selectedTempChampion}
+                    style={{ flex: 1, padding: '8px 12px', fontSize: '0.85rem' }}
                   >
-                    Cancelar
+                    Guardar
                   </button>
-                )}
+                  {championTeam && (
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => {
+                        setIsChangingChampion(false);
+                        setSelectedTempChampion(championTeam?.code || '');
+                      }}
+                      style={{ flex: 1, padding: '8px 12px', fontSize: '0.85rem' }}
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )}
