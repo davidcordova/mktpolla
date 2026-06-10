@@ -21,7 +21,15 @@ function getHeaders(): HeadersInit {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
+    const method = options.method || 'GET';
+    let url = `${API_BASE_URL}${path}`;
+    
+    // Add cache-busting timestamp to GET requests
+    if (method.toUpperCase() === 'GET') {
+        const separator = url.includes('?') ? '&' : '?';
+        url = `${url}${separator}_t=${Date.now()}`;
+    }
+
     const config = {
         ...options,
         headers: {
