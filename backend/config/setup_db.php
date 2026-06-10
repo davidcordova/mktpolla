@@ -296,20 +296,7 @@ try {
     $stmtAdmin->execute([$adminEmail, $adminPasswordHash]);
     if ($is_cli) echo "Admin account seeded successfully.\n";
 
-    // Seed a couple of test users for ranking demonstration (starting at 0 points/hits for clean testing)
-    $testUsers = [
-        ['Juan Perez', 'juan@gmail.com', 'user123', 'Marketing Alterno', 'ARG', 0, 0, 0],
-        ['Maria Lopez', 'maria@gmail.com', 'user123', 'Soporte Promocional', 'COL', 0, 0, 0],
-        ['Carlos Silva', 'carlos@gmail.com', 'user123', 'TYS365', 'BRA', 0, 0, 0],
-        ['Diego Maradona', 'diego@gmail.com', 'user123', 'Marketing Alterno', 'ARG', 0, 0, 0]
-    ];
-    
-    $stmtUser = $pdo->prepare("INSERT IGNORE INTO users (name, email, password_hash, country, favorite_team, points_total, hits_total, hits_eliminatory) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    foreach ($testUsers as $u) {
-        $hash = password_hash($u[2], PASSWORD_DEFAULT);
-        $stmtUser->execute([$u[0], $u[1], $hash, $u[3], $u[4], $u[5], $u[6], $u[7]]);
-    }
-    if ($is_cli) echo "Test users seeded successfully.\n";
+
     
     // Historic rankings are not seeded for a completely clean slate during testing.
     // If needed, they will populate as the user plays.

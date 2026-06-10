@@ -17,14 +17,9 @@ ALTER TABLE matches AUTO_INCREMENT = 1;
 ALTER TABLE users AUTO_INCREMENT = 1;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 1. Insertar Administrador por Defecto y Usuarios de Demo
--- El hash corresponde a la contraseña "admin123" usando PASSWORD_BCRYPT
+-- 1. Insertar Administrador por Defecto
 INSERT INTO users (id, name, email, password_hash, is_admin, avatar_url, country, favorite_team) VALUES
-(1, 'Administrador', 'admin@polla.com', '$2y$10$kHiI.jU03joxYXYVOV8yT.6hUJPN.lpmh0Gfovd9VEXPlcrk9Lq.C', TRUE, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80', 'Canadá', 'CAN'),
-(2, 'David Silva', 'david@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80', 'Colombia', 'COL'),
-(3, 'Carlos Gómez', 'carlos@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', 'México', 'MEX'),
-(4, 'María Rodríguez', 'maria@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80', 'Argentina', 'ARG'),
-(5, 'Gustavo Díaz', 'gustavo@gmail.com', '$2y$10$Uv0V3t7LqG9sX3n6p7eDbuH4.C.pWj8lWv3R.yGfR9G2R8Sj7X8Nq', FALSE, 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80', 'Perú', 'ARG');
+(1, 'Administrador', 'admin@polla.com', '$2y$10$kHiI.jU03joxYXYVOV8yT.6hUJPN.lpmh0Gfovd9VEXPlcrk9Lq.C', TRUE, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80', 'Canadá', 'CAN');
 
 -- 2. Insertar Equipos (48 Países - 12 Grupos de 4)
 INSERT INTO teams (code, name, group_name, logo_url) VALUES
@@ -77,9 +72,7 @@ INSERT INTO teams (code, name, group_name, logo_url) VALUES
 ('BOL', 'Bolivia', 'L', 'https://flagcdn.com/w80/bo.png'),
 ('NZL', 'Nueva Zelanda', 'L', 'https://flagcdn.com/w80/nz.png');
 
--- Asignar campeones predichos para usuarios demo (ahora que los equipos existen)
-UPDATE users SET champion_predicted_code = 'ARG' WHERE name IN ('David Silva', 'María Rodríguez', 'Gustavo Díaz');
-UPDATE users SET champion_predicted_code = 'BRA' WHERE name = 'Carlos Gómez';
+
 
 -- 3. Insertar Partidos de la Fase de Grupos (72 Partidos, 6 por Grupo)
 INSERT INTO matches (stage, group_name, team_a_code, team_b_code, match_date) VALUES
@@ -156,29 +149,4 @@ INSERT INTO matches (stage, group_name, team_a_code, team_b_code, match_date) VA
 ('GROUPS', 'L', 'DEN', 'NZL', '2026-06-23 07:00:00'),
 ('GROUPS', 'L', 'SWE', 'BOL', '2026-06-23 11:00:00');
 
--- Ligas Privadas
-INSERT INTO leagues (id, name, code, creator_id) VALUES
-(1, 'Liga Marketing Alterno', 'MKTAL26', 2),
-(2, 'Los Crackers del Mundial', 'CRK2026', 3);
 
--- Miembros de Ligas
-INSERT INTO league_members (league_id, user_id) VALUES
-(1, 2),
-(1, 3),
-(1, 4),
-(1, 5),
-(2, 3),
-(2, 4);
-
--- Historial de Ranking Inicial (para simular el gráfico de tendencia)
-INSERT INTO ranking_history (user_id, ranking_date, points, position) VALUES
-(2, '2026-06-01', 0, 15),
-(2, '2026-06-03', 10, 8),
-(2, '2026-06-05', 25, 3),
-(2, '2026-06-08', 42, 1),
-(3, '2026-06-01', 0, 10),
-(3, '2026-06-05', 12, 12),
-(3, '2026-06-08', 38, 2),
-(4, '2026-06-01', 0, 5),
-(4, '2026-06-05', 15, 6),
-(4, '2026-06-08', 35, 3);
