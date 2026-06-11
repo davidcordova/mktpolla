@@ -310,7 +310,7 @@ export const GroupPredictions: React.FC = () => {
       </div>
 
       {/* Matches Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '20px' }}>
         {activeMatches.map(m => {
           const pred = predictions[m.id] || { prediction: '', predicted_team_a_score: '', predicted_team_b_score: '' };
           const isSaved = savedPredictionIds.has(m.id);

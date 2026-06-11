@@ -259,7 +259,7 @@ export const Rankings: React.FC = () => {
       )}
 
       {/* Grid: Rankings List vs User Stats & Private Leagues */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '32px' }}>
+      <div className="rankings-grid">
         
         {/* Left Side: General Ranking Table */}
         <div className="glass-panel" style={{ padding: '24px', overflowX: 'auto' }}>

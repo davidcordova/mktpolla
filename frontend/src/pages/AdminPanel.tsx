@@ -300,14 +300,7 @@ export const AdminPanel: React.FC = () => {
               return (
                 <div 
                   key={m.id} 
-                  className="glass-panel" 
-                  style={{ 
-                    padding: '20px', 
-                    display: 'grid', 
-                    gridTemplateColumns: '1fr auto 1fr auto', 
-                    alignItems: 'center', 
-                    gap: '24px' 
-                  }}
+                  className="glass-panel admin-match-card" 
                 >
                   {/* Team A Input */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'flex-end' }}>

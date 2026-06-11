@@ -112,7 +112,7 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
       background: 'radial-gradient(circle at top left, hsla(150, 80%, 15%, 0.15), transparent 60%), radial-gradient(circle at bottom right, hsla(45, 100%, 15%, 0.1), transparent 60%)',
       padding: '20px'
     }}>
-      <div className="glass-panel" style={{
+      <div className="glass-panel register-panel" style={{
         width: '100%',
         maxWidth: '500px',
         padding: '40px',
@@ -220,7 +220,7 @@ export const Register: React.FC<RegisterProps> = ({ onLoginClick }) => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="register-two-col">
             <div className="form-group">
               <label className="form-label" htmlFor="register-country">Empresa</label>
               <div style={{ position: 'relative' }}>
